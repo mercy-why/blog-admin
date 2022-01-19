@@ -10,11 +10,23 @@ import User from '@/pages/System/User';
 import Role from '@/pages/System/Role';
 import RoleDistribute from '@/pages/System/Role/roleDistribute';
 import MenuManage from '@/pages/System/MenuManage';
+import BlogList from '@/pages/Bussiness/Blog';
+import EditorRoute from '@/pages/Bussiness/Blog/editor';
 
 const routerConfig: IRouterConfig[] = [
   {
     path: '/login',
     component: Login,
+  },
+  {
+    path: '/editor',
+    component: EditorRoute,
+    exact: true,
+  },
+  {
+    path: '/editor/:id',
+    component: EditorRoute,
+    exact: true,
   },
   {
     path: '/',
@@ -63,11 +75,21 @@ const routerConfig: IRouterConfig[] = [
         ],
       },
       {
+        path: '/blog',
+        children: [
+          {
+            path: '/article',
+            component: BlogList,
+          },
+        ],
+      },
+      {
         path: '/403',
         component: NotAccess,
       },
       {
         path: '',
+        exact: true,
         redirect: '/home',
       },
       {

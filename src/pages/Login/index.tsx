@@ -50,7 +50,7 @@ function Login() {
     <div className={styles['login-x']}>
       <div className={styles['login-content']}>
         <div className={styles['login-form']}>
-          <div className={styles['title']}>管理平台</div>
+          <div className={styles['title']}>博客后台管理系统</div>
           <Form
             form={form}
             className={styles['form-box']}

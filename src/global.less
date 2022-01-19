@@ -1,73 +1,114 @@
 @import '~antd/dist/antd.less';
-#ice-container{
+#ice-container {
   height: 100%;
   isolation: isolate;
-  .ant-pro-basicLayout-content{
+  .ant-pro-basicLayout-content {
     flex: 1;
     overflow: auto;
     padding: 24px;
     margin: 0;
   }
+  .bytemd {
+    height: calc(100vh - 64px);
+  }
 }
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 * {
   margin: 0;
 }
-html, body {
+html,
+body {
   height: 100%;
 }
 body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font: inherit;
 }
 
-p, h1, h2, h3, h4, h5, h6 {
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   overflow-wrap: break-word;
 }
-.hand{
+.hand {
   cursor: pointer;
 }
-.form-x.form-x{
-  padding:0 24px 24px;
+.form-x.form-x {
+  padding: 0 24px 24px;
   background: #fff;
 }
-.form-x{
+.form-x {
   text-align: center;
 }
-.ml5{
+.ml5 {
   margin-left: 5px;
 }
-.ml10{
+.ml10 {
   margin-left: 10px;
 }
-.main-card{
+.main-card {
   height: 100%;
 }
-.c-title-x{
+.c-title-x {
   cursor: pointer;
 }
-.c-title-x:hover{
+.c-title-x:hover {
   color: #1890ff;
 }
-.c-title{
+.c-title {
   margin-left: 10px;
 }
-.ant-pro-basicLayout{
+.ant-pro-basicLayout {
   height: 100%;
 }
-.ant-layout.ant-layout-has-sider{
+.ant-layout.ant-layout-has-sider {
   height: 100%;
 }
-.ant-pro-sider{
+.ant-pro-sider {
   height: 100%;
   overflow: auto;
+}
+.ar-x {
+  height: 100%;
+}
+.ar-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  .submit-btn {
+    margin-left: 20px;
+  }
+  .edit-title {
+    margin: 0;
+    padding: 0;
+    font-size: 24px;
+    font-weight: 500;
+    color: #1d2129;
+    border: none;
+    outline: none;
+    margin-right: 20px;
+  }
 }
