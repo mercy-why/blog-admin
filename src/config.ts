@@ -4,8 +4,10 @@ export default {
   default: {},
   local: {
     baseURL: '/api',
+    fileUrl: '/api/files',
   },
   prod: {
     baseURL: '/api',
+    fileUrl: '/api/files',
   },
 };

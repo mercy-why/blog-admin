@@ -7,27 +7,33 @@ import zhHans from 'bytemd/lib/locales/zh_Hans.json';
 import { Input, Button, message } from 'antd';
 import 'bytemd/dist/index.min.css';
 import 'highlight.js/styles/monokai-sublime.css';
-import { saveOrUpdate, getById } from './services';
-import { useParams } from 'ice';
+import { saveOrUpdate, getById, upload } from './services';
+import { useParams, config } from 'ice';
 
 const EditorComponent = ({ history }) => {
   const [value, setValue] = useState('');
   const [title, setTitle] = useState('');
   const plugins = [gfm(), highlight(), mdiumZoom()];
   const { id } = useParams<{ id: string }>();
-  const submitFn = async () => {
+  const submitFn = async (type: '1' | '2') => {
     const data = {
       title,
       content: value,
-      description: '',
-      status: '1',
+      status: type,
     };
     if (id) {
       Object.assign(data, { id });
     }
     await saveOrUpdate(data);
     message.success('保存成功');
-    history.goBack();
+    history.push('/blog/article');
+  };
+  const uploadImg = async (files) => {
+    const file = files[0];
+    const params = new FormData();
+    params.append('file', file, file.name);
+    const res = await upload(params);
+    return [{ url: `${config.fileUrl}${res.url}`, title: res.originalFilename }];
   };
   useEffect(() => {
     if (id) {
@@ -48,10 +54,11 @@ const EditorComponent = ({ history }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <Button onClick={() => history.goBack()}>
-          返回文章列表
+        <Button onClick={() => history.push('/blog/article')}>返回文章列表</Button>
+        <Button className="submit-btn" onClick={() => submitFn('2')} type="primary" ghost>
+          保存为草稿
         </Button>
-        <Button className="submit-btn" type="primary" onClick={submitFn}>
+        <Button className="submit-btn" type="primary" onClick={() => submitFn('1')}>
           发布
         </Button>
       </div>
@@ -59,6 +66,7 @@ const EditorComponent = ({ history }) => {
         locale={zhHans}
         value={value}
         plugins={plugins}
+        uploadImages={uploadImg}
         onChange={(v) => {
           setValue(v);
         }}
