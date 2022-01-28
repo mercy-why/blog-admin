@@ -16,11 +16,11 @@ const appConfig: IAppConfig = {
       interceptors: {
         request: {
           onConfig: (config) => {
-            const jwt = localStorage.getItem('jwt');
+            const authorization = localStorage.getItem('authorization');
             // 发送请求前：可以对 RequestConfig 做一些统一处理
             if (history?.location.pathname !== '/login') {
-              if (jwt) {
-                Object.assign(config.headers, { jwt });
+              if (authorization) {
+                Object.assign(config.headers, { authorization });
               } else {
                 history?.push('/login');
               }
@@ -34,8 +34,15 @@ const appConfig: IAppConfig = {
         },
         response: {
           onConfig: (response) => {
+            const code = response?.data.code;
             // 请求成功：可以做全局的 toast 展示，或者对 response 做一些格式化
-            if (response?.data.code !== 0) {
+            if (code === 401) {
+              history?.replace({
+                pathname: '/login',
+                search: `redirect=${history?.location.pathname}`,
+              });
+            }
+            if (code !== 200) {
               message.error(response.data.msg || '请求错误');
               return Promise.reject(response);
             }
@@ -46,17 +53,6 @@ const appConfig: IAppConfig = {
             const msg = status ? codeMessage[status] : '请求错误';
             message.destroy();
             message.error(msg);
-            if (status === 401) {
-              history?.replace({
-                pathname: '/login',
-                search: `redirect=${history?.location.pathname}`,
-              });
-            }
-            if (status === 403) {
-              history?.push({
-                pathname: '/403',
-              });
-            }
             return Promise.reject(error);
           },
         },
@@ -67,19 +63,6 @@ const appConfig: IAppConfig = {
       baseURL: iceConfig.baseURL,
       interceptors: {
         request: {
-          onConfig: (config) => {
-            const jwt = localStorage.getItem('jwt');
-            // 发送请求前：可以对 RequestConfig 做一些统一处理
-            if (history?.location.pathname !== '/login') {
-              if (jwt) {
-                Object.assign(config.headers, { jwt });
-              } else {
-                history?.push('/login');
-              }
-            }
-
-            return config;
-          },
           onError: (error) => {
             return Promise.reject(error);
           },
@@ -87,7 +70,7 @@ const appConfig: IAppConfig = {
         response: {
           onConfig: (response) => {
             // 请求成功：可以做全局的 toast 展示，或者对 response 做一些格式化
-            if (response?.data.code !== 0) {
+            if (response?.data.code !== 200) {
               message.error(response.data.msg || '请求错误');
             }
             return response;

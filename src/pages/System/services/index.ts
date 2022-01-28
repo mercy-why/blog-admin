@@ -65,7 +65,7 @@ export const updateSysResource = (data: {
 // 角色
 export const getSysRoleList = (params?: { id: string }) => {
   return request({
-    url: '/sys/getSysRoleList',
+    url: '/role/getRoleList',
     method: 'get',
     params,
   });
@@ -90,7 +90,7 @@ export const deleteSysRole = (params: { id: number }) => {
 
 export const getMenuTree = () => {
   return request({
-    url: '/sys/getMenuTree',
+    url: '/permission/getPermissionTree',
     method: 'get',
   });
 };
@@ -103,16 +103,15 @@ export const updateMenu = (data: { name: string; url: string; icon: string; id: 
   });
 };
 
-export const batchAddMenus = (data: {
-  sysMenuList: Array<{
-    name: string;
-    url: string;
-    icon: string;
-    parentId: React.Key;
-  }>;
+export const addPermission = (data: {
+  permissionName: string;
+  url: string;
+  icon: string;
+  parentId: React.Key;
+  type: string;
 }) => {
   return request({
-    url: '/sys/batchAddMenus',
+    url: '/permission/addPermission',
     method: 'post',
     data,
   });
@@ -156,20 +155,20 @@ export const distributeInterfaces = (data: {
   });
 };
 
-export const getUserList = (params: {
+export const getUserListPage = (params: {
   currentPage?: number;
   pageSize?: number;
   userName?: string;
   account?: string;
 }) => {
   return request({
-    url: '/sys/getUserList',
+    url: '/user/getUserListPage',
     method: 'get',
     params,
   });
 };
 
-export const register = (data: {
+export const addAccount = (data: {
   account: string;
   password: string;
   userName?: string;
@@ -181,7 +180,7 @@ export const register = (data: {
   roles: Array<{ id: number }>;
 }) => {
   return request({
-    url: '/register',
+    url: '/addAccount',
     method: 'post',
     data,
   });

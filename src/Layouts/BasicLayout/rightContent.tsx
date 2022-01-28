@@ -53,8 +53,8 @@ function RightContent() {
   };
   const { loading: confirmLoading, request } = useRequest(switchRole, {
     onSuccess: (res) => {
-      const { jwt } = res.headers;
-      localStorage.setItem('jwt', jwt);
+      const { authorization } = res.headers;
+      localStorage.setItem('authorization', authorization);
       setVisible(false);
       userDispatchers.getUserInfo();
     },

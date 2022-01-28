@@ -6,17 +6,19 @@ import RightContent from './rightContent';
 import iconsMap from './icons';
 
 interface menuItem {
-  name: string;
+  permissionName: string;
   icon?: string;
   children?: menuItem[];
   url: string;
+  type: 'F' | 'B' | 'M' | 'C';
 }
 const loopMenuItem = (menuList: menuItem[]) =>
-  menuList?.map(({ name, children, url, icon }) => {
+  menuList?.map(({ permissionName, children, url, icon, type }) => {
     return {
       path: url,
       key: url,
-      name,
+      hideInMenu: type === 'F' || type === 'B',
+      name: permissionName,
       icon: icon && iconsMap[icon] && createElement(iconsMap[icon]),
       children: children && loopMenuItem(children),
     };
@@ -38,7 +40,7 @@ export default function BasicLayout({ children, history }) {
       location={{
         pathname: history.location.pathname,
       }}
-      menuDataRender={() => loopMenuItem(userInfo?.menuList)}
+      menuDataRender={() => loopMenuItem(userInfo?.userPermission)}
       menuItemRender={(item, defaultDom) => {
         if (!item.path) {
           return defaultDom;

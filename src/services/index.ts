@@ -4,9 +4,16 @@ export const loginUserInfo = () => {
   return request({
     url: '/loginUserInfo',
     method: 'get',
-    instanceName: 'loginRequest',
   });
 };
+
+export const loginUserMenus = () => {
+  return request({
+    url: '/loginUserMenus',
+    method: 'get',
+  });
+};
+
 
 export const switchRole = (params: { roleId: string }) => {
   return request({

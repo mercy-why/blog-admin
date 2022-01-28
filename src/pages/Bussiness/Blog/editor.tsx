@@ -16,6 +16,10 @@ const EditorComponent = ({ history }) => {
   const plugins = [gfm(), highlight(), mdiumZoom()];
   const { id } = useParams<{ id: string }>();
   const submitFn = async (type: '1' | '2') => {
+    if (!title) {
+      message.error('请输入文章标题');
+      return;
+    }
     const data = {
       title,
       content: value,

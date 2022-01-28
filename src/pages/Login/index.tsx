@@ -8,7 +8,7 @@ interface loginParams {
   account: string;
   password: string;
   rememberMe: boolean;
-  captcha: string;
+  verifyCode: string;
 }
 
 function Login() {
@@ -18,13 +18,13 @@ function Login() {
   const { data: codeData, refresh } = useRequest(captchaImage, {
     manual: false,
   });
-  const { uuid, img } = codeData || {};
+  const { uuid, data: img } = codeData || {};
   const loginFn = (values: loginParams) => loginReq({ ...values, uuid });
   const { loading, request } = useRequest(loginFn, {
     onSuccess: (res) => {
-      if (res.data.code === 0) {
-        const { jwt } = res.headers;
-        localStorage.setItem('jwt', jwt);
+      if (res.data.code === 200) {
+        const { authorization } = res.headers;
+        localStorage.setItem('authorization', authorization);
         const { redirect } = getSearchParams();
         if (redirect && redirect !== '/login') {
           history.push(redirect as string);
@@ -40,7 +40,7 @@ function Login() {
   const checkVCode = async (_: any, value: string) => {
     if (!value) {
       return Promise.reject(new Error('请输入验证码'));
-    } else if (!/^[A-Za-z0-9]{3,4}$/.test(value)) {
+    } else if (!/^[A-Za-z0-9]{3,5}$/.test(value)) {
       return Promise.reject(new Error('请输入正确的验证码'));
     } else {
       return Promise.resolve();
@@ -50,7 +50,7 @@ function Login() {
     <div className={styles['login-x']}>
       <div className={styles['login-content']}>
         <div className={styles['login-form']}>
-          <div className={styles['title']}>博客后台管理系统</div>
+          <div className={styles['title']}>后台管理系统</div>
           <Form
             form={form}
             className={styles['form-box']}
@@ -72,10 +72,10 @@ function Login() {
             </Form.Item>
             <Form.Item>
               <Space className={styles['code-x']}>
-                <Form.Item name="captcha" noStyle rules={[{ validator: checkVCode }]}>
+                <Form.Item name="verifyCode" noStyle rules={[{ validator: checkVCode }]}>
                   <Input placeholder="请输入验证码" />
                 </Form.Item>
-                {img && <img className={styles['verify-x']} onClick={refresh} src={`data:image/jpg;base64,${img}`} />}
+                {img && <img className={styles['verify-x']} onClick={refresh} src={img} />}
               </Space>
             </Form.Item>
             <Form.Item name="rememberMe" valuePropName="checked">

@@ -1,5 +1,5 @@
 // src/models/user.ts
-import { loginUserInfo } from '@/services';
+import { loginUserInfo, loginUserMenus } from '@/services';
 import { IRootState, IRootDispatch } from '@/store';
 import { history } from 'ice';
 
@@ -34,24 +34,22 @@ export default {
   // 定义处理该模型副作用的函数
   effects: (dispatch: IRootDispatch) => ({
     async getUserInfo() {
-      const jwt = localStorage.getItem('jwt');
-      if (!jwt) {
+      const authorization = localStorage.getItem('authorization');
+      if (!authorization) {
         history?.replace({
           pathname: '/login',
           search: `redirect=${history?.location.pathname}`,
         });
         return;
       }
-      const { data } = await loginUserInfo();
-      const { nickName, userName, currentMenuList: menuList, id: userId, currentRole, roles } = data;
+      const [userInfo, userPermission] = await Promise.all([loginUserInfo(), loginUserMenus()]);
+      const { userName, userId, account } = userInfo;
       dispatch.user.update({
         userInfo: {
-          nickName,
           userName,
-          menuList,
           userId,
-          currentRole,
-          roles,
+          account,
+          userPermission,
         },
       });
     },

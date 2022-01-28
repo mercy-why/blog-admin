@@ -1,21 +1,20 @@
 import { useRef, useState } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
-import { getUserList, updateUser, register, deleteUser, getSysRoleList, resetPwd } from '../services';
+import { getUserListPage, updateUser, addAccount, deleteUser, getSysRoleList, resetPwd } from '../services';
 import { message, Popconfirm, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 interface tableItem {
-  id: number;
-  status: string;
+  userId: string;
+  enabled: number;
   userName: string;
   account: string;
   isCreate?: boolean;
   roles?: Array<{
-    id: React.Key;
+    roleId: React.Key;
     roleKey: string;
     roleName: string;
-    status: string;
   }>;
   roleIds: number[];
 }
@@ -65,11 +64,11 @@ export default () => {
           rules: [{ required: true, message: '此项为必填项' }],
         };
       },
-      render: (t, record) => record.roles?.map((x) => x.roleName).join(),
+      render: (t, record) => record.roles?.map((x) => x.roleKey).join(),
     },
     {
       title: '用户状态',
-      dataIndex: 'status',
+      dataIndex: 'enabled',
       search: false,
       valueEnum: {
         0: {
@@ -108,22 +107,18 @@ export default () => {
         >
           <a onClick={async () => {}}>重置密码</a>
         </Popconfirm>,
-        record.id === 1 ? (
-          ''
-        ) : (
-          <Popconfirm
-            key="delete"
-            title="是否删除此用户?"
-            onConfirm={async () => {
-              await deleteUser({ userId: record.id });
-              action?.reset && action?.reset();
-            }}
-            okText="是"
-            cancelText="否"
-          >
-            <a>删除</a>
-          </Popconfirm>
-        ),
+        <Popconfirm
+          key="delete"
+          title="是否删除此用户?"
+          onConfirm={async () => {
+            await deleteUser({ userId: record.userId });
+            action?.reset && action?.reset();
+          }}
+          okText="是"
+          cancelText="否"
+        >
+          <a>删除</a>
+        </Popconfirm>,
       ],
     },
   ];
@@ -142,14 +137,14 @@ export default () => {
       recordCreatorProps={false}
       request={async (params) => {
         const { current: currentPage, pageSize, userName, account } = params;
-        const { records, total } = await getUserList({
+        const { records, total } = await getUserListPage({
           currentPage,
           pageSize,
           userName,
           account,
         });
         return {
-          data: records.map((x) => ({ ...x, roleIds: x.roles.map((i) => i.id) })),
+          data: records?.map((x) => ({ ...x, roleIds: x.roles?.map((i) => i.roleId) })),
           success: true,
           total,
         };
@@ -157,17 +152,17 @@ export default () => {
       editable={{
         editableKeys,
         onSave: async (key, record) => {
-          const { userName, status, isCreate, id, account, roleIds } = record;
+          const { userName, enabled, isCreate, userId, account, roleIds } = record;
           const msg = isCreate ? '新增' : '编辑';
           const roles = roleIds.map((x) => ({
             id: x,
           }));
           const password = `${account}123`;
           if (isCreate) {
-            await register({ userName, status, account, password, roles });
+            await addAccount({ userName, enabled, account, password, roles });
             actionRef.current?.reset && actionRef.current?.reset();
           } else {
-            await updateUser({ id, userName, status, account, roles });
+            await updateUser({ userId, userName, enabled, account, roles });
             actionRef.current?.reload();
           }
           message.success(`${msg}成功`);
@@ -182,7 +177,7 @@ export default () => {
         pageSize: 10,
         hideOnSinglePage: true,
       }}
-      rowKey={(r) => r.id}
+      rowKey={(r) => r.userId}
       options={false}
       headerTitle="用户管理"
       toolBarRender={() => [

@@ -8,7 +8,7 @@ import { useRequest, Link } from 'ice';
 
 interface tableItem {
   id: number;
-  status: string;
+  enabled: string;
   roleName: string;
   remark: string;
   roleKey: string;
@@ -46,8 +46,8 @@ export default () => {
           rules: [
             { required: true, message: '此项为必填项' },
             {
-              pattern: /^ROLE_[a-zA-Z0-9]+$/,
-              message: '权限标识只能是由 ROLE_ 开头的英文或数字字符',
+              pattern: /^[a-zA-Z0-9]+$/,
+              message: '权限标识只能是英文或数字字符',
             },
           ],
         };
@@ -64,7 +64,7 @@ export default () => {
     },
     {
       title: '角色状态',
-      dataIndex: 'status',
+      dataIndex: 'enabled',
       search: false,
       valueEnum: {
         0: {

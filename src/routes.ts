@@ -45,7 +45,7 @@ const routerConfig: IRouterConfig[] = [
             exact: true,
           },
           {
-            path: '/menuManage',
+            path: '/menu',
             component: MenuManage,
           },
           {

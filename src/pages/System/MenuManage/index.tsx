@@ -1,26 +1,27 @@
 import React, { useRef, useState } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
-import { getMenuTree, updateMenu, batchAddMenus, deleteMenus } from '../services';
-import { message, Popconfirm } from 'antd';
+import { getMenuTree, updateMenu, addPermission, deleteMenus } from '../services';
+import { message, Popconfirm, Tag, Button } from 'antd';
 import { useRequest } from 'ice';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import ProForm from '@ant-design/pro-form';
+import { PlusOutlined } from '@ant-design/icons';
 
 interface DataSourceType {
-  key: React.Key;
-  id: React.Key;
+  permissionId: React.Key;
   url: string;
-  name: string;
+  permissionName: string;
   icon: string;
   parentId: React.Key;
   children?: DataSourceType[];
   isCreate?: boolean;
+  type: string;
 }
 export default () => {
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() => []);
-  const [editLine, setEditLine] = useState<{ name: string; url: string; icon: string }>({
-    name: '',
+  const [editLine, setEditLine] = useState<{ permissionName: string; url: string; icon: string }>({
+    permissionName: '',
     url: '',
     icon: '',
   });
@@ -30,7 +31,7 @@ export default () => {
   const loopMenuId = (list: DataSourceType[], arr: React.Key[] = []) => {
     list &&
       list.forEach((item) => {
-        arr.push(item.id);
+        arr.push(item.permissionId);
         if (item.children) {
           loopMenuId(item.children, arr);
         }
@@ -40,18 +41,37 @@ export default () => {
   const createItem = () => {
     return {
       parentId: 0,
-      name: '',
+      permissionName: '',
       url: '',
       icon: '',
       isCreate: true,
-      id: Date.now(),
-      key: Date.now(),
+      type: 'C',
+      permissionId: Date.now(),
+      sort: 0,
     };
+  };
+  const statusMap = {
+    C: {
+      color: 'blue',
+      text: '目录',
+    },
+    M: {
+      color: 'green',
+      text: '菜单',
+    },
+    F: {
+      color: 'volcano',
+      text: '功能',
+    },
+    B: {
+      color: '',
+      text: '按钮',
+    },
   };
   const columns: Array<ProColumns<DataSourceType>> = [
     {
       title: '菜单名称',
-      dataIndex: 'name',
+      dataIndex: 'permissionName',
       formItemProps: () => {
         return {
           rules: [{ required: true, message: '此项为必填项' }],
@@ -72,36 +92,38 @@ export default () => {
       dataIndex: 'icon',
     },
     {
+      title: '类型',
+      dataIndex: 'type',
+      editable: false,
+      render: (t, record) => <Tag color={statusMap[record.type].color}>{statusMap[record.type].text}</Tag>,
+    },
+    {
       title: '操作',
       valueType: 'option',
       width: 200,
       render: (text, record: DataSourceType, _, action) => [
-        record.parentId === 0 ? (
-          <a
-            key="create"
-            onClick={() => {
-              action?.addEditRecord(
-                {
-                  ...createItem(),
-                  parentId: record.id,
-                },
-                {
-                  parentKey: record.key,
-                  newRecordType: 'dataSource',
-                },
-              );
-              setExpandedRowKeys([...editableKeys, record.key]);
-            }}
-          >
-            新增子菜单
-          </a>
-        ) : (
-          ''
-        ),
+        <a
+          key="create"
+          onClick={() => {
+            action?.addEditRecord(
+              {
+                ...createItem(),
+                parentId: record.permissionId,
+              },
+              {
+                parentKey: record.permissionId,
+                newRecordType: 'dataSource',
+              },
+            );
+            setExpandedRowKeys([...editableKeys, record.permissionId]);
+          }}
+        >
+          新增子菜单
+        </a>,
         <a
           key="editable"
           onClick={() => {
-            action?.startEditable?.(record.key);
+            action?.startEditable?.(record.permissionId);
           }}
         >
           编辑
@@ -111,7 +133,7 @@ export default () => {
           title="是否删除此菜单?"
           onConfirm={async () => {
             const list = record.children ? loopMenuId(record.children) : [];
-            list.push(record.id);
+            list.push(record.permissionId);
             await deleteMenus({ ids: list.join() });
             action?.reload(true);
             message.success('删除成功');
@@ -126,8 +148,8 @@ export default () => {
   ];
 
   const { request: updateReq } = useRequest(updateMenu);
-  const { request: createReq } = useRequest(batchAddMenus);
-
+  const { request: createReq } = useRequest(addPermission);
+  const createFn = () => {};
   return (
     <ProForm<{
       table: DataSourceType[];
@@ -137,17 +159,17 @@ export default () => {
       className="form-x"
     >
       <EditableProTable<DataSourceType>
-        rowKey={(r) => r.key}
-        headerTitle="菜单管理"
+        rowKey={(r) => r.permissionId}
+        headerTitle="权限管理"
         actionRef={actionRef}
         name="table"
         expandable={{
           expandedRowKeys,
           onExpand: (expanded, record) => {
             if (expanded) {
-              setExpandedRowKeys([...expandedRowKeys, record.key]);
+              setExpandedRowKeys([...expandedRowKeys, record.permissionId]);
             } else {
-              setExpandedRowKeys(expandedRowKeys.filter((x) => x !== record.key));
+              setExpandedRowKeys(expandedRowKeys.filter((x) => x !== record.permissionId));
             }
           },
         }}
@@ -158,23 +180,25 @@ export default () => {
             success: true,
           };
         }}
-        recordCreatorProps={{
-          record: createItem,
-          creatorButtonText: '新增目录菜单',
-        }}
         columns={columns}
+        toolBarRender={() => [
+          <Button key="button" icon={<PlusOutlined />} type="primary" onClick={createFn}>
+            新增目录
+          </Button>,
+        ]}
+        recordCreatorProps={false}
         editable={{
           editableKeys,
           actionRender: (row, config, defaultDoms) => {
             return [defaultDoms.save, defaultDoms.cancel];
           },
           onSave: async (key, data) => {
-            const { icon, name, url } = editLine;
-            const { isCreate, id, parentId } = data;
+            const { icon, permissionName, url } = editLine;
+            const { isCreate, permissionId, parentId, type } = data;
             if (isCreate) {
-              await createReq({ sysMenuList: [{ icon, name, url, parentId }] });
+              await createReq({ icon, permissionName, url, parentId, type });
             } else {
-              await updateReq({ icon, id, name, url });
+              await updateReq({ icon, permissionId, permissionName, url });
             }
             const msg = isCreate ? '新增' : '编辑';
             message.success(`${msg}成功`);

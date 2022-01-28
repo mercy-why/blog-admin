@@ -1,6 +1,12 @@
 import { request } from 'ice';
 
-export const loginReq = (data: { account: string; password: string; rememberMe: boolean; uuid: string }) =>
+export const loginReq = (data: {
+  account: string;
+  password: string;
+  rememberMe: boolean;
+  uuid: string;
+  verifyCode: string;
+}) =>
   request({
     url: '/login',
     method: 'post',
@@ -11,7 +17,7 @@ export const loginReq = (data: { account: string; password: string; rememberMe: 
 
 export const captchaImage = () =>
   request({
-    url: '/captchaImage',
+    url: '/captcha',
     method: 'get',
     instanceName: 'loginRequest',
   });

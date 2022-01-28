@@ -29,6 +29,7 @@
   "scripts": {
     "start": "icejs start --mode local",
     "build": "icejs build --mode prod",
+    "build-zip": "icejs build --mode prod && zip manage-system manage-system -r -m",
     "lint": "npm run eslint && npm run stylelint",
     "eslint": "eslint --cache --ext .js,.jsx ./",
     "stylelint": "stylelint ./**/*.scss"
