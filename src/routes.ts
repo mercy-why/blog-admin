@@ -4,12 +4,10 @@ import Home from '@/pages/Home';
 import NotFound from '@/pages/Others/NotFound';
 import NotAccess from '@/pages/Others/NotAccess';
 import Login from '@/pages/Login';
-import Auth from '@/pages/System/Auth';
-import InterfaceList from '@/pages/System/Auth/list';
 import User from '@/pages/System/User';
 import Role from '@/pages/System/Role';
 import RoleDistribute from '@/pages/System/Role/roleDistribute';
-import MenuManage from '@/pages/System/MenuManage';
+import Auth from '@/pages/System/Auth';
 import BlogList from '@/pages/Bussiness/Blog';
 import EditorRoute from '@/pages/Bussiness/Blog/editor';
 
@@ -45,8 +43,8 @@ const routerConfig: IRouterConfig[] = [
             exact: true,
           },
           {
-            path: '/menu',
-            component: MenuManage,
+            path: '/auth',
+            component: Auth,
           },
           {
             path: '/role',
@@ -56,16 +54,6 @@ const routerConfig: IRouterConfig[] = [
           {
             path: '/role/:id',
             component: RoleDistribute,
-            exact: true,
-          },
-          {
-            path: '/auth',
-            component: Auth,
-            exact: true,
-          },
-          {
-            path: '/auth/:id',
-            component: InterfaceList,
             exact: true,
           },
           {

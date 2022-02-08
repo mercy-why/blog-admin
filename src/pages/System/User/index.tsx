@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
-import { getUserListPage, updateUser, addAccount, deleteUser, getSysRoleList, resetPwd } from '../services';
+import { getUserListPage, updateUser, addUser, deleteUser, getRoleList, resetPassword } from '../services';
 import { message, Popconfirm, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 interface tableItem {
   userId: string;
-  enabled: number;
+  enabled: string;
   userName: string;
   account: string;
   isCreate?: boolean;
@@ -16,7 +16,7 @@ interface tableItem {
     roleKey: string;
     roleName: string;
   }>;
-  roleIds: number[];
+  roleList: string[];
 }
 
 export default () => {
@@ -46,13 +46,13 @@ export default () => {
     },
     {
       title: '角色',
-      dataIndex: 'roleIds',
+      dataIndex: 'roleList',
       valueType: 'select',
       search: false,
       request: async () => {
-        const userData = await getSysRoleList();
-        return userData.map((x: { id: number; roleName: string }) => ({
-          value: x.id,
+        const userData = await getRoleList();
+        return userData.map((x: { roleId: string; roleName: string }) => ({
+          value: x.roleId,
           label: x.roleName,
         }));
       },
@@ -64,12 +64,15 @@ export default () => {
           rules: [{ required: true, message: '此项为必填项' }],
         };
       },
-      render: (t, record) => record.roles?.map((x) => x.roleKey).join(),
+      renderText: (t, record) => record.roles?.map((x) => x.roleId),
+      render: (t, record) => record.roles?.map((x) => x.roleName).join(),
     },
     {
       title: '用户状态',
       dataIndex: 'enabled',
       search: false,
+      valueType: 'select',
+      renderText: (t) => String(t),
       valueEnum: {
         0: {
           text: '停用',
@@ -90,7 +93,7 @@ export default () => {
         <a
           key="editable"
           onClick={() => {
-            action?.startEditable?.(record.id);
+            action?.startEditable?.(record.userId);
           }}
         >
           编辑
@@ -99,7 +102,7 @@ export default () => {
           key="reset"
           title="是否重置此用户密码?"
           onConfirm={async () => {
-            await resetPwd({ userId: record.id });
+            await resetPassword({ userId: record.userId });
             message.success('密码已重置');
           }}
           okText="是"
@@ -112,6 +115,7 @@ export default () => {
           title="是否删除此用户?"
           onConfirm={async () => {
             await deleteUser({ userId: record.userId });
+            message.success('删除成功');
             action?.reset && action?.reset();
           }}
           okText="是"
@@ -123,12 +127,18 @@ export default () => {
     },
   ];
   const createFn = () => {
-    actionRef.current?.addEditRecord({
-      id: Date.now(),
-      moduleName: '',
-      status: '1',
-      isCreate: true,
-    });
+    actionRef.current?.addEditRecord(
+      {
+        userId: Date.now(),
+        userName: '',
+        enabled: '1',
+        isCreate: true,
+        roles: [],
+      },
+      {
+        position: 'top',
+      },
+    );
   };
   return (
     <EditableProTable<tableItem>
@@ -144,7 +154,7 @@ export default () => {
           account,
         });
         return {
-          data: records?.map((x) => ({ ...x, roleIds: x.roles?.map((i) => i.roleId) })),
+          data: records,
           success: true,
           total,
         };
@@ -152,17 +162,15 @@ export default () => {
       editable={{
         editableKeys,
         onSave: async (key, record) => {
-          const { userName, enabled, isCreate, userId, account, roleIds } = record;
+          const { userName, enabled, isCreate, userId, account, roleList } = record;
           const msg = isCreate ? '新增' : '编辑';
-          const roles = roleIds.map((x) => ({
-            id: x,
-          }));
-          const password = `${account}123`;
+          const roleIdsStr = roleList.join();
+          const unencryptPwd = `${account}123`;
           if (isCreate) {
-            await addAccount({ userName, enabled, account, password, roles });
+            await addUser({ userName, enabled, account, unencryptPwd, roleIdsStr });
             actionRef.current?.reset && actionRef.current?.reset();
           } else {
-            await updateUser({ userId, userName, enabled, account, roles });
+            await updateUser({ userId, userName, enabled, account, roleIdsStr });
             actionRef.current?.reload();
           }
           message.success(`${msg}成功`);

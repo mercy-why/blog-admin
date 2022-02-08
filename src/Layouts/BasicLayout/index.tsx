@@ -33,7 +33,7 @@ export default function BasicLayout({ children, history }) {
 
   return (
     <ProLayout
-      title="博客后台管理"
+      title="后台管理系统"
       style={{
         minHeight: '100vh',
       }}

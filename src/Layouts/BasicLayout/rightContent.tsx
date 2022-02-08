@@ -24,6 +24,7 @@ function RightContent() {
   const history = useHistory();
   const loginOutFn = async () => {
     const { pathname } = history.location;
+    await loginOut();
     if (window.location.pathname !== '/login') {
       history.replace({
         pathname: '/login',
@@ -32,7 +33,6 @@ function RightContent() {
         }),
       });
     }
-    await loginOut();
     localStorage.clear();
   };
   const onMenuClick = (event: MenuInfo) => {
@@ -119,7 +119,7 @@ function RightContent() {
         <Space className="hand">
           <Avatar shape="square" size="small" icon={<UserOutlined />} />
           <span>{nickName || userName}</span>
-          <span>({currentRole?.roleName})</span>
+          <span>{currentRole ? currentRole.roleName : ''}</span>
           <DownCircleOutlined />
         </Space>
       </Dropdown>

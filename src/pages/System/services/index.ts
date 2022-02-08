@@ -1,69 +1,8 @@
 import { request } from 'ice';
 import React from 'react';
 
-// 模块
-export const getSysModuleList = (params: { moduleName?: string }) => {
-  return request({
-    url: '/sys/getSysModuleList',
-    method: 'get',
-    params,
-  });
-};
-
-export const addOrUpdateSysModule = (data: { moduleName: string; status: string; id?: React.Key }) => {
-  return request({
-    url: '/sys/addOrUpdateSysModule',
-    method: 'post',
-    data,
-  });
-};
-
-export const deleteSysModule = (params: { id: number }) => {
-  return request({
-    url: '/sys/deleteSysModule',
-    method: 'delete',
-    params,
-  });
-};
-
-// URL
-export const getSysResourceList = (params: { moduleId: React.Key }) => {
-  return request({
-    url: '/sys/getSysResourceList',
-    method: 'get',
-    params,
-  });
-};
-
-export const addSysResource = (data: {
-  resourceName: string;
-  resourceUrl: string;
-  status: string;
-  moduleId: React.Key;
-}) => {
-  return request({
-    url: '/sys/addSysResource',
-    method: 'post',
-    data: { sysResourceList: [data] },
-  });
-};
-
-export const updateSysResource = (data: {
-  resourceName: string;
-  resourceUrl: string;
-  status: string;
-  id: React.Key;
-  moduleId: React.Key;
-}) => {
-  return request({
-    url: '/sys/updateSysResource',
-    method: 'put',
-    data,
-  });
-};
-
 // 角色
-export const getSysRoleList = (params?: { id: string }) => {
+export const getRoleList = (params?: { id: string }) => {
   return request({
     url: '/role/getRoleList',
     method: 'get',
@@ -71,33 +10,49 @@ export const getSysRoleList = (params?: { id: string }) => {
   });
 };
 
-// 新增或修改角色
-export const addOrUpdateSysRole = (data: { roleKey: string; roleName: string; id?: number; status?: string }) => {
+// 新增角色
+export const addRole = (data: { roleKey: string; roleName: string; status?: string }) => {
   return request({
-    url: '/sys/addOrUpdateSysRole',
+    url: '/role/addRole',
     method: 'post',
     data,
   });
 };
-
-export const deleteSysRole = (params: { id: number }) => {
+// 修改角色
+export const updateRole = (data: { roleKey: string; roleName: string; status?: string; roleId?: React.Key }) => {
   return request({
-    url: '/sys/deleteSysRole',
+    url: '/role/updateRole',
+    method: 'put',
+    data,
+  });
+};
+// 删除角色
+export const deleteRole = (params: { roleId: string }) => {
+  return request({
+    url: '/role/deleteRole',
     method: 'delete',
     params,
   });
 };
 
-export const getMenuTree = () => {
+export const getPermissionTree = () => {
   return request({
     url: '/permission/getPermissionTree',
     method: 'get',
   });
 };
 
-export const updateMenu = (data: { name: string; url: string; icon: string; id: React.Key }) => {
+export const updatePermission = (data: {
+  permissionName: string;
+  url: string;
+  icon: string;
+  type: string;
+  sort: number;
+  parentId?: string;
+  permissionId: string;
+}) => {
   return request({
-    url: '/sys/updateMenu',
+    url: '/permission/updatePermission',
     method: 'put',
     data,
   });
@@ -107,8 +62,9 @@ export const addPermission = (data: {
   permissionName: string;
   url: string;
   icon: string;
-  parentId: React.Key;
   type: string;
+  sort: number;
+  parentId?: string;
 }) => {
   return request({
     url: '/permission/addPermission',
@@ -117,19 +73,35 @@ export const addPermission = (data: {
   });
 };
 
-export const deleteMenus = (params: { ids: string }) => {
+export const deletePermission = (params: { permissionId: string }) => {
   return request({
-    url: '/sys/deleteMenus',
+    url: '/permission/deletePermission',
     method: 'delete',
     params,
   });
 };
 
-export const deleteSysResource = (params: { moduleId: React.Key; resourceId: React.Key }) => {
+export const distributeRoles = (data: { userId: string; roleIds: string }) => {
   return request({
-    url: '/sys/deleteSysResource',
-    method: 'delete',
+    url: '/user/distributeRoles',
+    method: 'post',
+    data,
+  });
+};
+
+export const getPermissionTreeByRoleId = (params: { roleId: string }) => {
+  return request({
+    url: '/role/getPermissionTreeByRoleId',
+    method: 'get',
     params,
+  });
+};
+
+export const distributePermissions = (data: { roleId: string; permissionIds: string }) => {
+  return request({
+    url: '/role/distributePermissions',
+    method: 'post',
+    data,
   });
 };
 
@@ -168,37 +140,29 @@ export const getUserListPage = (params: {
   });
 };
 
-export const addAccount = (data: {
+export const addUser = (data: {
   account: string;
-  password: string;
-  userName?: string;
-  nickName?: string;
-  status: string;
-  sex?: string;
-  email?: string;
-  phonenumber?: string;
-  roles: Array<{ id: number }>;
+  unencryptPwd: string;
+  userName: string;
+  enabled: string;
+  roleIdsStr: string;
 }) => {
   return request({
-    url: '/addAccount',
+    url: '/user/addUser',
     method: 'post',
     data,
   });
 };
 
 export const updateUser = (data: {
-  id: React.Key;
+  userId: React.Key;
   account: string;
-  userName?: string;
-  nickName?: string;
-  status: string;
-  sex?: string;
-  email?: string;
-  phonenumber?: string;
-  roles: Array<{ id: number }>;
+  userName: string;
+  enabled: string;
+  roleIdsStr: string;
 }) => {
   return request({
-    url: '/sys/updateUser',
+    url: '/user/updateUser',
     method: 'put',
     data,
   });
@@ -206,16 +170,16 @@ export const updateUser = (data: {
 
 export const deleteUser = (params: { userId: React.Key }) => {
   return request({
-    url: '/sys/deleteUser',
+    url: '/user/deleteUser',
     method: 'delete',
     params,
   });
 };
 
-export const resetPwd = (params: { userId: React.Key }) => {
+export const resetPassword = (params: { userId: React.Key }) => {
   return request({
-    url: '/sys/resetPwd',
-    method: 'get',
+    url: '/user/resetPassword',
+    method: 'put',
     params,
   });
 };

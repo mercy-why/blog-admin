@@ -3,16 +3,16 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Button, Form, message, Popconfirm } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { getSysRoleList, addOrUpdateSysRole, deleteSysRole } from '../services';
+import { getRoleList, addRole, updateRole, deleteRole } from '../services';
 import { useRequest, Link } from 'ice';
 
 interface tableItem {
-  id: number;
-  enabled: string;
+  roleId: string;
+  enabled: number;
   roleName: string;
-  remark: string;
   roleKey: string;
   isCreate?: boolean;
+  modified: number;
 }
 
 export default () => {
@@ -20,17 +20,15 @@ export default () => {
   const [form] = Form.useForm();
   const createFn = () => {
     actionRef.current?.addEditRecord({
-      id: (Math.random() * 1000000).toFixed(0),
-      roleKey: 'ROLE_',
+      roleId: (Math.random() * 1000000).toFixed(0),
+      roleKey: '',
       roleName: '',
-      remark: '',
-      status: '1',
+      enabled: '1',
       isCreate: true,
     });
   };
 
-  const { request: addOrUpdateRequest } = useRequest(addOrUpdateSysRole);
-  const { request: deleteRequest } = useRequest(deleteSysRole, {
+  const { request: deleteRequest } = useRequest(deleteRole, {
     onSuccess: () => {
       message.success('删除成功');
       actionRef.current?.reload(true);
@@ -66,6 +64,7 @@ export default () => {
       title: '角色状态',
       dataIndex: 'enabled',
       search: false,
+      renderText: t => String(t),
       valueEnum: {
         0: {
           text: '停用',
@@ -81,28 +80,30 @@ export default () => {
       title: '操作',
       valueType: 'option',
       render: (text, record, _, action) => {
-        return [
-          <a
-            key="editable"
-            onClick={() => {
-              action?.startEditable?.(record.id);
-            }}
-          >
-            编辑
-          </a>,
-          <Popconfirm
-            key="del"
-            title="是否删除此角色?"
-            onConfirm={() => deleteRequest({ id: record.id })}
-            okText="是"
-            cancelText="否"
-          >
-            <a>删除</a>
-          </Popconfirm>,
-          <Link key="disturb" to={`/system/role/${record.id}`}>
-            分配权限
-          </Link>,
-        ];
+        return record.modified === 1
+          ? [
+            <a
+              key="editable"
+              onClick={() => {
+                action?.startEditable?.(record.roleId);
+              }}
+            >
+              编辑
+            </a>,
+            <Popconfirm
+              key="del"
+              title="是否删除此角色?"
+              onConfirm={() => deleteRequest({ roleId: record.roleId })}
+              okText="是"
+              cancelText="否"
+            >
+              <a>删除</a>
+            </Popconfirm>,
+            <Link key="disturb" to={`/system/role/${record.roleId}`}>
+              分配权限
+            </Link>,
+          ]
+          : '';
       },
     },
   ];
@@ -111,13 +112,13 @@ export default () => {
       columns={columns}
       actionRef={actionRef}
       request={async () => {
-        const data = await getSysRoleList();
+        const data = await getRoleList();
         return {
           data,
           success: true,
         };
       }}
-      rowKey="id"
+      rowKey="roleId"
       search={false}
       dateFormatter="string"
       options={false}
@@ -125,15 +126,21 @@ export default () => {
       editable={{
         form,
         onSave: async (key, data) => {
-          const { roleKey, roleName, isCreate, id, status } = data;
+          const { roleKey, roleName, isCreate, roleId, enabled } = data;
           const params = {
             roleKey,
             roleName,
-            status,
+            enabled,
           };
-          !isCreate && Object.assign(params, { id });
-          const msg = isCreate ? '新增' : '编辑';
-          await addOrUpdateRequest(params);
+          let msg = '';
+          if (!isCreate) {
+            Object.assign(params, { roleId });
+            await updateRole(params);
+            msg = '编辑';
+          } else {
+            await addRole(params);
+            msg = '编辑';
+          }
           message.success(`${msg}成功`);
           actionRef.current?.reload(true);
         },

@@ -21,7 +21,6 @@ export const switchRole = (params: { roleId: string }) => {
     method: 'get',
     params,
     withFullResponse: true,
-    instanceName: 'loginRequest',
   });
 };
 
@@ -29,7 +28,6 @@ export const loginOut = () => {
   return request({
     url: '/logout',
     method: 'get',
-    instanceName: 'loginRequest',
   });
 };
 

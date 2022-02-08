@@ -25,7 +25,6 @@ const appConfig: IAppConfig = {
                 history?.push('/login');
               }
             }
-
             return config;
           },
           onError: (error) => {
@@ -52,7 +51,7 @@ const appConfig: IAppConfig = {
             const { status } = error?.response || {};
             const msg = status ? codeMessage[status] : '请求错误';
             message.destroy();
-            message.error(msg);
+            message.error(msg || '请求错误');
             return Promise.reject(error);
           },
         },
