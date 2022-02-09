@@ -58,7 +58,7 @@ function Login() {
             validateTrigger="onBlur"
             initialValues={{ rememberMe: false }}
           >
-            <div className={styles['sub-title']}>账号密码登录</div>
+            {/* <div className={styles['sub-title']}>账号密码登录</div> */}
             <Form.Item name="account" rules={[{ required: true, message: '请输入账号' }]}>
               <Input autoComplete="username" prefix={<UserOutlined />} placeholder="请输入账号" />
             </Form.Item>
@@ -71,11 +71,11 @@ function Login() {
               />
             </Form.Item>
             <Form.Item>
-              <Space className={styles['code-x']}>
+              <Space className="code-x">
                 <Form.Item name="verifyCode" noStyle rules={[{ validator: checkVCode }]}>
                   <Input placeholder="请输入验证码" />
                 </Form.Item>
-                {img && <img className={styles['verify-x']} onClick={refresh} src={img} />}
+                <img className={styles['verify-x']} onClick={refresh} src={img} />
               </Space>
             </Form.Item>
             <Form.Item name="rememberMe" valuePropName="checked">

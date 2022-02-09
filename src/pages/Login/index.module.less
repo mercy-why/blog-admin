@@ -10,7 +10,7 @@
     position: relative;
     display: flex;
     justify-content: center;
-    padding-top: 5%;
+    padding-top: 10%;
     &::after {
       content: '';
       background-repeat: no-repeat;
@@ -48,7 +48,7 @@
   .form-box {
     width: 400px;
     background-color: #fff;
-    border:1px solid #d9d9d9;
+    box-shadow: 0 1px 2px -2px #00000029, 0 3px 6px #0000001f, 0 5px 12px 4px #00000017;
     padding: 60px;
     border-radius: 20px;
     .ant-form-item-label {
@@ -59,12 +59,6 @@
       width: 100px;
       cursor: pointer;
     }
-    .code-x {
-      width: 100%;
-      .ant-space-item:first-child {
-        flex: 1;
-      }
-    }
     .ant-input {
       background: #f7f7f7;
       border-color: transparent;
@@ -74,7 +68,7 @@
       border-color: transparent;
     }
     .sub-x {
-      border-radius: 26px;
+      border-radius: 4px;
     }
   }
 }

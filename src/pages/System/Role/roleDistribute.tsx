@@ -26,9 +26,9 @@ const loopPermissionId = (PermissionList: PermissionItem[], arr: string[] = []) 
 const loopExpendPermissionId = (PermissionList: PermissionItem[], arr: string[] = []) => {
   PermissionList &&
     PermissionList.forEach((item) => {
-      arr.push(item.permissionId);
       if (item.children) {
-        loopExpendPermissionId(item.children);
+        arr.push(item.permissionId);
+        loopExpendPermissionId(item.children, arr);
       }
     });
   return arr;
@@ -109,8 +109,9 @@ export default function DisturbList() {
   useEffect(() => {
     if (roleInfo) {
       setPermissionKeys(loopPermissionId(roleInfo));
+      setPermissionExpendKeys(loopExpendPermissionId(PermissionTreeData));
     }
-  }, [roleInfo]);
+  }, [roleInfo, PermissionTreeData]);
   return (
     <ProCard
       className="main-card"

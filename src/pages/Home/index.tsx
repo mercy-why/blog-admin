@@ -3,12 +3,12 @@ import { useEffect } from 'react';
 
 export default function Home({ history }) {
   const [userState] = store.useModel('user');
-  const { menuList } = (userState?.userInfo as any) || {};
+  const { userPermission } = (userState?.userInfo as any) || {};
   useEffect(() => {
-    if (menuList) {
-      history.replace(menuList[0].url);
+    if (userPermission) {
+      history.replace(userPermission[0].url);
     }
-  }, [menuList, history]);
+  }, [userPermission, history]);
 
   return <div>home</div>;
 }

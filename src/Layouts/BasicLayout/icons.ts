@@ -1,3 +1,3 @@
-import { ControlOutlined, FileMarkdownOutlined } from '@ant-design/icons';
+import { ControlOutlined, FileMarkdownOutlined, ProfileOutlined } from '@ant-design/icons';
 
-export default { ControlOutlined, FileMarkdownOutlined };
+export default { ControlOutlined, FileMarkdownOutlined, ProfileOutlined };
